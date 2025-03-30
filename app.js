@@ -23,7 +23,7 @@ function getInitialDishes() {
             id: 4,
             name: '糯米排骨饭',
             price: '¥18/份',
-            image: 'hhttps://s21.ax1x.com/2025/03/31/pEsJbrj.jpg'
+            image: 'https://s21.ax1x.com/2025/03/31/pEsJbrj.jpg'
         }
     ];
 }
@@ -55,7 +55,12 @@ function login() {
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // 从 GitHub 加载菜品数据
-        const response = await fetch(GITHUB_API_URL);
+        const response = await fetch(GITHUB_API_URL, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`
+            }
+        });
+        
         if (response.ok) {
             const data = await response.json();
             const content = atob(data.content);
@@ -67,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             dishes = getInitialDishes();
         }
     } catch (e) {
-        console.error('加载数据失败，使用初始数据');
+        console.error('加载数据失败，使用初始数据:', e);
         dishes = getInitialDishes();
     }
 
@@ -252,19 +257,6 @@ async function saveEdit(dishNumber) {
         return;
     }
 
-    // 验证图片 URL
-    try {
-        const img = new Image();
-        await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = imageInput.value;
-        });
-    } catch (error) {
-        alert('图片链接无效，请检查URL是否正确！');
-        return;
-    }
-
     // 更新菜品信息
     const dishIndex = dishNumber - 1;
     if (dishIndex < 0 || dishIndex >= dishes.length) {
@@ -285,12 +277,20 @@ async function saveEdit(dishNumber) {
 
     try {
         // 获取当前文件内容
-        const response = await fetch(GITHUB_API_URL);
+        const response = await fetch(GITHUB_API_URL, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`获取文件失败: ${response.status}`);
+        }
+        
         const data = await response.json();
-        const currentContent = atob(data.content);
         const currentSha = data.sha;
 
-        // 将 JSON 转换为字符串，确保正确处理中文字符
+        // 将 JSON 转换为字符串
         const jsonString = JSON.stringify(dishes, null, 2);
         const content = btoa(unescape(encodeURIComponent(jsonString)));
 
@@ -309,7 +309,8 @@ async function saveEdit(dishNumber) {
         });
 
         if (!updateResponse.ok) {
-            throw new Error('更新失败');
+            const errorData = await updateResponse.json();
+            throw new Error(`更新失败: ${errorData.message || updateResponse.status}`);
         }
 
         // 重新渲染页面
@@ -323,7 +324,7 @@ async function saveEdit(dishNumber) {
         alert('保存成功！');
     } catch (error) {
         console.error('保存失败:', error);
-        alert('保存失败，请重试！');
+        alert(`保存失败: ${error.message}`);
     }
 }
 
