@@ -273,7 +273,8 @@ async function saveEdit(dishNumber) {
         });
         
         if (!response.ok) {
-            throw new Error(`获取文件失败: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(`获取文件失败: ${response.status} - ${errorData.message || '未知错误'}`);
         }
         
         const data = await response.json();
@@ -299,7 +300,7 @@ async function saveEdit(dishNumber) {
 
         if (!updateResponse.ok) {
             const errorData = await updateResponse.json();
-            throw new Error(`更新失败: ${errorData.message || updateResponse.status}`);
+            throw new Error(`更新失败: ${updateResponse.status} - ${errorData.message || '未知错误'}`);
         }
 
         // 重新渲染页面
