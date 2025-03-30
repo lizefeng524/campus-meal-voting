@@ -30,7 +30,7 @@ function getInitialDishes() {
 
 // 添加 GitHub API 相关配置
 const GITHUB_API_URL = 'https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/dishes.json';
-const GITHUB_TOKEN = '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'; // 需要替换为你的实际token
+const GITHUB_TOKEN = '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'; // 需要替换为你的实际token
 
 // 声明全局变量
 let dishes = getInitialDishes();
@@ -210,7 +210,8 @@ function showEditForm(dishNumber) {
             <h3>编辑菜品 #${dishNumber}</h3>
             <input type="text" id="editName_${dishNumber}" value="${dish.name}" placeholder="菜品名称">
             <input type="text" id="editPrice_${dishNumber}" value="${dish.price}" placeholder="价格">
-            <input type="text" id="editImage_${dishNumber}" value="${dish.image}" placeholder="请输入图片URL链接" onchange="previewImage(this, ${dishNumber})">
+            <input type="text" id="editImage_${dishNumber}" value="${dish.image}" placeholder="请输入图片URL链接">
+            <button onclick="previewImage(${dishNumber})" class="preview-button">预览图片</button>
             <img id="imagePreview_${dishNumber}" src="${dish.image}" alt="预览图" class="preview-image" 
                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=暂无图片'">
             <div class="edit-buttons">
@@ -225,23 +226,12 @@ function showEditForm(dishNumber) {
 }
 
 // 修改 previewImage 函数
-function previewImage(input, dishNumber) {
+function previewImage(dishNumber) {
+    const imageInput = document.getElementById(`editImage_${dishNumber}`);
     const preview = document.getElementById(`imagePreview_${dishNumber}`);
-    if (input && input.value) {
-        // 检查 URL 是否有效
-        const img = new Image();
-        img.onload = function() {
-            preview.src = input.value;
-        };
-        img.onerror = function() {
-            alert('图片链接无效，请检查URL是否正确！');
-            // 恢复原始图片
-            const dishIndex = dishNumber - 1;
-            if (dishIndex >= 0 && dishIndex < dishes.length) {
-                preview.src = dishes[dishIndex].image;
-            }
-        };
-        img.src = input.value;
+    
+    if (imageInput && imageInput.value) {
+        preview.src = imageInput.value;
     }
 }
 
@@ -250,9 +240,8 @@ async function saveEdit(dishNumber) {
     const nameInput = document.getElementById(`editName_${dishNumber}`);
     const priceInput = document.getElementById(`editPrice_${dishNumber}`);
     const imageInput = document.getElementById(`editImage_${dishNumber}`);
-    const imagePreview = document.getElementById(`imagePreview_${dishNumber}`);
 
-    if (!nameInput || !priceInput || !imageInput || !imagePreview) {
+    if (!nameInput || !priceInput || !imageInput) {
         console.error('找不到表单元素');
         return;
     }
