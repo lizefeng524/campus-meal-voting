@@ -206,7 +206,8 @@ function showEditForm(dishNumber) {
             <input type="text" id="editName_${dishNumber}" value="${dish.name}" placeholder="菜品名称">
             <input type="text" id="editPrice_${dishNumber}" value="${dish.price}" placeholder="价格">
             <input type="text" id="editImage_${dishNumber}" value="${dish.image}" placeholder="图片URL链接" onchange="previewImage(this, ${dishNumber})">
-            <img id="imagePreview_${dishNumber}" src="${dish.image}" alt="预览图" class="preview-image">
+            <img id="imagePreview_${dishNumber}" src="${dish.image}" alt="预览图" class="preview-image" 
+                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=暂无图片'">
             <div class="edit-buttons">
                 <button onclick="saveEdit(${dishNumber})">保存</button>
                 <button onclick="cancelEdit()">取消</button>
@@ -222,7 +223,20 @@ function showEditForm(dishNumber) {
 function previewImage(input, dishNumber) {
     const preview = document.getElementById(`imagePreview_${dishNumber}`);
     if (input && input.value) {
-        preview.src = input.value;
+        // 检查 URL 是否有效
+        const img = new Image();
+        img.onload = function() {
+            preview.src = input.value;
+        };
+        img.onerror = function() {
+            alert('图片链接无效，请检查URL是否正确！');
+            // 恢复原始图片
+            const dishIndex = dishNumber - 1;
+            if (dishIndex >= 0 && dishIndex < dishes.length) {
+                preview.src = dishes[dishIndex].image;
+            }
+        };
+        img.src = input.value;
     }
 }
 
@@ -231,9 +245,23 @@ async function saveEdit(dishNumber) {
     const nameInput = document.getElementById(`editName_${dishNumber}`);
     const priceInput = document.getElementById(`editPrice_${dishNumber}`);
     const imageInput = document.getElementById(`editImage_${dishNumber}`);
+    const imagePreview = document.getElementById(`imagePreview_${dishNumber}`);
 
-    if (!nameInput || !priceInput || !imageInput) {
+    if (!nameInput || !priceInput || !imageInput || !imagePreview) {
         console.error('找不到表单元素');
+        return;
+    }
+
+    // 验证图片 URL
+    try {
+        const img = new Image();
+        await new Promise((resolve, reject) => {
+            img.onload = resolve;
+            img.onerror = reject;
+            img.src = imageInput.value;
+        });
+    } catch (error) {
+        alert('图片链接无效，请检查URL是否正确！');
         return;
     }
 
