@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吃饱饱团餐投票</title>
+    <!-- 引入 Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 引入自定义样式 -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Banner部分 -->
+    <div class="banner">
+        <h1>吃饱饱团餐计划</h1>
+        <button class="login-button" onclick="login()">管理员登录</button>
+    </div>
+
+    <!-- 简介部分 -->
+    <section class="intro">
+        <p>我们致力于为同学们提供健康、美味、实惠的团餐服务。所有菜品均由专业厨师现炒现做，严选新鲜食材，保证营养均衡。让每一位同学都能享受到家的味道，感受温暖与关怀。</p>
+    </section>
+
+    <!-- 菜品展示 -->
+    <section class="dishes">
+        <div class="section-header">
+            <h2>本周热门套餐</h2>
+        </div>
+        <div class="dishes-grid" id="dishesGrid">
+            <!-- 菜品卡片将通过 JavaScript 动态生成 -->
+        </div>
+    </section>
+
+    <!-- 投票部分 -->
+    <section class="voting">
+        <div class="voting-container">
+            <h2>下周你想吃什么？投票决定！</h2>
+            <form id="voteForm">
+                <div class="vote-options" id="voteOptions">
+                    <!-- 投票选项将通过 JavaScript 动态生成 -->
+                </div>
+                <button type="submit" class="vote-button" id="voteButton">提交投票</button>
+            </form>
+            <div class="results" id="voteResults">
+                <!-- 投票结果将通过 JavaScript 动态生成 -->
+            </div>
+        </div>
+    </section>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+/* 全局样式 */
+body {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+}
+
+/* Banner样式 */
+.banner {
+    height: 300px;
+    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
+                url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-align: center;
+    position: relative;
+}
+
+.banner h1 {
+    font-size: 3rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+}
+
+/* 简介部分 */
+.intro {
+    padding: 2rem;
+    text-align: center;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.intro p {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 菜品展示 */
+.dishes {
+    padding: 2rem;
+    background: #f9f9f9;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-header h2 {
+    color: #ff6b35;
+    font-size: 2rem;
+}
+
+.dishes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dish-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.dish-card:hover {
+    transform: translateY(-5px);
+}
+
+.dish-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.dish-info {
+    padding: 1rem;
+}
+
+.dish-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #ff6b35;
+    margin-bottom: 0.5rem;
+}
+
+.dish-price {
+    color: #e67e22;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* 投票部分 */
+.voting {
+    padding: 2rem;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.voting-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.voting h2 {
+    text-align: center;
+    color: #ff6b35;
+    margin-bottom: 2rem;
+}
+
+.vote-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.vote-option {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.vote-option:hover {
+    background: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.vote-option input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.vote-button {
+    display: block;
+    width: 200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background: #ff6b35;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.vote-button:hover:not(:disabled) {
+    background: #e67e22;
+    transform: translateY(-2px);
+}
+
+.vote-button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* 投票结果 */
+.results {
+    margin-top: 2rem;
+}
+
+.result-bar {
+    margin-bottom: 1rem;
+}
+
+.result-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.result-bar-fill {
+    height: 20px;
+    background: linear-gradient(90deg, #ff6b35, #e67e22);
+    border-radius: 10px;
+    transition: width 0.3s;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .banner h1 {
+        font-size: 2rem;
+    }
+
+    .dishes-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 编辑相关样式 */
+.edit-button {
+    background: #ff6b35;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: all 0.3s;
+}
+
+.edit-button:hover {
+    background: #e67e22;
+}
+
+.edit-form {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.edit-form-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+}
+
+.edit-form-content h3 {
+    margin-bottom: 1rem;
+    color: #ff6b35;
+}
+
+.edit-form-content input {
+    width: 100%;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.image-upload {
+    margin-bottom: 1rem;
+}
+
+.image-upload input[type="file"] {
+    margin-bottom: 0.5rem;
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 0.5rem;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.edit-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.edit-buttons button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.edit-buttons button:first-child {
+    background: #ff6b35;
+    color: white;
+}
+
+.edit-buttons button:last-child {
+    background: #ccc;
+    color: #333;
+}
+
+.edit-buttons button:hover {
+    opacity: 0.9;
+}
+
+/* 登录按钮样式 */
+.login-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid white;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.login-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 添加序号样式 */
+.dish-number {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 107, 53, 0.9);
+    color: white;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    font-weight: bold;
+    z-index: 1;
+} 
+ 
