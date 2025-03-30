@@ -210,7 +210,7 @@ function showEditForm(dishNumber) {
             <h3>编辑菜品 #${dishNumber}</h3>
             <input type="text" id="editName_${dishNumber}" value="${dish.name}" placeholder="菜品名称">
             <input type="text" id="editPrice_${dishNumber}" value="${dish.price}" placeholder="价格">
-            <input type="text" id="editImage_${dishNumber}" value="${dish.image}" placeholder="图片URL链接" onchange="previewImage(this, ${dishNumber})">
+            <input type="text" id="editImage_${dishNumber}" value="${dish.image}" placeholder="请输入图片URL链接" onchange="previewImage(this, ${dishNumber})">
             <img id="imagePreview_${dishNumber}" src="${dish.image}" alt="预览图" class="preview-image" 
                 onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=暂无图片'">
             <div class="edit-buttons">
