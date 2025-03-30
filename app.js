@@ -1,4 +1,4 @@
-// 将 dishes 数组的初始化改为函数
+/ 将 dishes 数组的初始化改为函数
 function getInitialDishes() {
     return [
         {
@@ -28,6 +28,10 @@ function getInitialDishes() {
     ];
 }
 
+// 添加 GitHub API 相关配置
+const GITHUB_API_URL = 'https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/dishes.json';
+const GITHUB_TOKEN = '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'; // 需要替换为你的实际token
+
 // 声明全局变量
 let dishes = getInitialDishes();
 let editingDishId = null;
@@ -48,16 +52,21 @@ function login() {
 }
 
 // 修改初始化代码
-document.addEventListener('DOMContentLoaded', () => {
-    // 从 localStorage 加载菜品数据
-    const savedDishes = localStorage.getItem('dishes');
-    if (savedDishes) {
-        try {
-            dishes = JSON.parse(savedDishes);
-        } catch (e) {
-            console.error('加载保存的菜品数据失败，使用初始数据');
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // 从 GitHub 加载菜品数据
+        const response = await fetch(GITHUB_API_URL);
+        if (response.ok) {
+            const data = await response.json();
+            const content = JSON.parse(atob(data.content));
+            dishes = content;
+        } else {
+            console.error('加载GitHub数据失败，使用初始数据');
             dishes = getInitialDishes();
         }
+    } catch (e) {
+        console.error('加载数据失败，使用初始数据');
+        dishes = getInitialDishes();
     }
 
     // 确保DOM元素存在
@@ -208,20 +217,55 @@ function showEditForm(dishNumber) {
     document.body.appendChild(form);
 }
 
-// 修改图片预览函数
-function previewImage(input, dishNumber) {
+// 修改 previewImage 函数
+async function previewImage(input, dishNumber) {
     const preview = document.getElementById(`imagePreview_${dishNumber}`);
     if (input.files && input.files[0]) {
+        const file = input.files[0];
         const reader = new FileReader();
-        reader.onload = function(e) {
+        
+        reader.onload = async function(e) {
             preview.src = e.target.result;
+            
+            // 将图片转换为 base64
+            const base64Image = e.target.result.split(',')[1];
+            
+            // 生成唯一的文件名
+            const fileName = `images/dish_${dishNumber}_${Date.now()}.jpg`;
+            
+            try {
+                // 上传图片到 GitHub
+                const uploadResponse = await fetch(`https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/${fileName}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: `上传菜品 ${dishNumber} 的图片`,
+                        content: base64Image
+                    })
+                });
+
+                if (uploadResponse.ok) {
+                    const data = await uploadResponse.json();
+                    // 更新预览图片的 src 为 GitHub 上的图片 URL
+                    preview.src = data.content.download_url;
+                } else {
+                    throw new Error('图片上传失败');
+                }
+            } catch (error) {
+                console.error('图片上传失败:', error);
+                alert('图片上传失败，请重试！');
+            }
         }
-        reader.readAsDataURL(input.files[0]);
+        
+        reader.readAsDataURL(file);
     }
 }
 
 // 修改 saveEdit 函数
-function saveEdit(dishNumber) {
+async function saveEdit(dishNumber) {
     const nameInput = document.getElementById(`editName_${dishNumber}`);
     const priceInput = document.getElementById(`editPrice_${dishNumber}`);
     const imagePreview = document.getElementById(`imagePreview_${dishNumber}`);
@@ -232,7 +276,7 @@ function saveEdit(dishNumber) {
     }
 
     // 更新菜品信息
-    const dishIndex = dishNumber - 1; // 因为序号从1开始，所以要减1
+    const dishIndex = dishNumber - 1;
     if (dishIndex < 0 || dishIndex >= dishes.length) {
         console.error('无效的菜品序号');
         return;
@@ -240,25 +284,53 @@ function saveEdit(dishNumber) {
 
     // 更新菜品信息
     const updatedDish = {
-        id: dishes[dishIndex].id, // 保持原有的ID
+        id: dishes[dishIndex].id,
         name: nameInput.value,
         price: priceInput.value,
-        image: imagePreview.src
+        image: imagePreview.src // 使用 GitHub 上的图片 URL
     };
 
     // 更新数组中的特定菜品
     dishes[dishIndex] = updatedDish;
 
-    // 保存到 localStorage
-    localStorage.setItem('dishes', JSON.stringify(dishes));
+    try {
+        // 获取当前文件内容
+        const response = await fetch(GITHUB_API_URL);
+        const data = await response.json();
+        const currentContent = atob(data.content);
+        const currentSha = data.sha;
 
-    // 重新渲染页面
-    renderDishes();
-    renderVoteOptions();
-    updateVoteResults();
+        // 准备更新请求
+        const updateResponse = await fetch(GITHUB_API_URL, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: '更新菜品信息',
+                content: btoa(JSON.stringify(dishes, null, 2)),
+                sha: currentSha
+            })
+        });
 
-    // 关闭编辑表单
-    cancelEdit();
+        if (!updateResponse.ok) {
+            throw new Error('更新失败');
+        }
+
+        // 重新渲染页面
+        renderDishes();
+        renderVoteOptions();
+        updateVoteResults();
+
+        // 关闭编辑表单
+        cancelEdit();
+        
+        alert('保存成功！');
+    } catch (error) {
+        console.error('保存失败:', error);
+        alert('保存失败，请重试！');
+    }
 }
 
 function cancelEdit() {
