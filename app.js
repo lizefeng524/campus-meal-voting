@@ -58,8 +58,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch(GITHUB_API_URL);
         if (response.ok) {
             const data = await response.json();
-            const content = JSON.parse(atob(data.content));
-            dishes = content;
+            const content = atob(data.content);
+            // 正确处理中文字符
+            const decodedContent = decodeURIComponent(escape(content));
+            dishes = JSON.parse(decodedContent);
         } else {
             console.error('加载GitHub数据失败，使用初始数据');
             dishes = getInitialDishes();
@@ -287,7 +289,7 @@ async function saveEdit(dishNumber) {
         id: dishes[dishIndex].id,
         name: nameInput.value,
         price: priceInput.value,
-        image: imagePreview.src // 使用原始内容 URL
+        image: imagePreview.src
     };
 
     // 更新数组中的特定菜品
@@ -300,6 +302,10 @@ async function saveEdit(dishNumber) {
         const currentContent = atob(data.content);
         const currentSha = data.sha;
 
+        // 将 JSON 转换为字符串，确保正确处理中文字符
+        const jsonString = JSON.stringify(dishes, null, 2);
+        const content = btoa(unescape(encodeURIComponent(jsonString)));
+
         // 准备更新请求
         const updateResponse = await fetch(GITHUB_API_URL, {
             method: 'PUT',
@@ -309,7 +315,7 @@ async function saveEdit(dishNumber) {
             },
             body: JSON.stringify({
                 message: '更新菜品信息',
-                content: btoa(JSON.stringify(dishes, null, 2)),
+                content: content,
                 sha: currentSha
             })
         });
