@@ -5,25 +5,25 @@ function getInitialDishes() {
             id: 1,
             name: '干锅排骨',
             price: '¥18.8/份',
-            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_1.jpg'
+            image: 'https://s21.ax1x.com/2025/03/31/pEsJHMQ.jpg'
         },
         {
             id: 2,
             name: '干锅虾',
             price: '¥18.8/份',
-            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_2.jpg'
+            image: 'https://s21.ax1x.com/2025/03/31/pEsJOZn.jpg'
         },
         {
             id: 3,
             name: '鸡丝拌面',
             price: '¥14/份',
-            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_3.jpg'
+            image: 'https://s21.ax1x.com/2025/03/31/pEsJOZn.jpg'
         },
         {
             id: 4,
             name: '糯米排骨饭',
             price: '¥18/份',
-            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_4.jpg'
+            image: 'hhttps://s21.ax1x.com/2025/03/31/pEsJbrj.jpg'
         }
     ];
 }
@@ -186,9 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 添加编辑相关的函数
+// 修改 showEditForm 函数
 function showEditForm(dishNumber) {
-    const dish = dishes[dishNumber - 1]; // 因为序号从1开始，所以要减1
+    const dish = dishes[dishNumber - 1];
     if (!dish) return;
 
     // 移除可能存在的旧表单
@@ -205,10 +205,8 @@ function showEditForm(dishNumber) {
             <h3>编辑菜品 #${dishNumber}</h3>
             <input type="text" id="editName_${dishNumber}" value="${dish.name}" placeholder="菜品名称">
             <input type="text" id="editPrice_${dishNumber}" value="${dish.price}" placeholder="价格">
-            <div class="image-upload">
-                <input type="file" id="editImage_${dishNumber}" accept="image/*" onchange="previewImage(this, ${dishNumber})">
-                <img id="imagePreview_${dishNumber}" src="${dish.image}" alt="预览图" class="preview-image">
-            </div>
+            <input type="text" id="editImage_${dishNumber}" value="${dish.image}" placeholder="图片URL链接" onchange="previewImage(this, ${dishNumber})">
+            <img id="imagePreview_${dishNumber}" src="${dish.image}" alt="预览图" class="preview-image">
             <div class="edit-buttons">
                 <button onclick="saveEdit(${dishNumber})">保存</button>
                 <button onclick="cancelEdit()">取消</button>
@@ -221,61 +219,10 @@ function showEditForm(dishNumber) {
 }
 
 // 修改 previewImage 函数
-async function previewImage(input, dishNumber) {
+function previewImage(input, dishNumber) {
     const preview = document.getElementById(`imagePreview_${dishNumber}`);
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        
-        reader.onload = async function(e) {
-            // 先显示本地预览
-            preview.src = e.target.result;
-            
-            try {
-                // 将图片转换为 base64
-                const base64Image = e.target.result.split(',')[1];
-                
-                // 生成文件名
-                const fileName = `dish_${dishNumber}.jpg`;
-                
-                // 上传图片
-                const uploadResponse = await fetch(`https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images/${fileName}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: `更新菜品 ${dishNumber} 的图片`,
-                        content: base64Image
-                    })
-                });
-
-                if (uploadResponse.ok) {
-                    // 使用原始内容 URL
-                    const imageUrl = `https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/${fileName}`;
-                    preview.src = imageUrl;
-                    
-                    // 更新当前菜品的图片 URL
-                    const dishIndex = dishNumber - 1;
-                    if (dishIndex >= 0 && dishIndex < dishes.length) {
-                        dishes[dishIndex].image = imageUrl;
-                    }
-                } else {
-                    throw new Error('图片上传失败');
-                }
-            } catch (error) {
-                console.error('图片上传失败:', error);
-                alert('图片上传失败，请重试！');
-                // 恢复原始图片
-                const dishIndex = dishNumber - 1;
-                if (dishIndex >= 0 && dishIndex < dishes.length) {
-                    preview.src = dishes[dishIndex].image;
-                }
-            }
-        }
-        
-        reader.readAsDataURL(file);
+    if (input && input.value) {
+        preview.src = input.value;
     }
 }
 
@@ -283,9 +230,9 @@ async function previewImage(input, dishNumber) {
 async function saveEdit(dishNumber) {
     const nameInput = document.getElementById(`editName_${dishNumber}`);
     const priceInput = document.getElementById(`editPrice_${dishNumber}`);
-    const imagePreview = document.getElementById(`imagePreview_${dishNumber}`);
+    const imageInput = document.getElementById(`editImage_${dishNumber}`);
 
-    if (!nameInput || !priceInput || !imagePreview) {
+    if (!nameInput || !priceInput || !imageInput) {
         console.error('找不到表单元素');
         return;
     }
@@ -302,7 +249,7 @@ async function saveEdit(dishNumber) {
         id: dishes[dishIndex].id,
         name: nameInput.value,
         price: priceInput.value,
-        image: imagePreview.src
+        image: imageInput.value
     };
 
     // 更新数组中的特定菜品
