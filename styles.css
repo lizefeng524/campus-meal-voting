@@ -331,5 +331,20 @@ body {
     border-radius: 3px;
     font-weight: bold;
     z-index: 1;
+}
+
+.preview-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: all 0.3s;
+}
+
+.preview-button:hover {
+    background: #45a049;
 } 
  
