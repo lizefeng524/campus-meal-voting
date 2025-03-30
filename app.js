@@ -5,25 +5,25 @@ function getInitialDishes() {
             id: 1,
             name: '干锅排骨',
             price: '¥18.8/份',
-            image: 'https://images.unsplash.com/photo-1544025162-d76694265947?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+            image: '55b482ce006b2f73ada1ecd4333855b'
         },
         {
             id: 2,
             name: '干锅虾',
             price: '¥18.8/份',
-            image: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+            image: 'e42265557acb2bce332ec01acbbf815'
         },
         {
             id: 3,
             name: '鸡丝拌面',
             price: '¥14/份',
-            image: 'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+            image: 'e44d685e934c73bf90691cc2d06bc2f'
         },
         {
             id: 4,
             name: '糯米排骨饭',
             price: '¥18/份',
-            image: 'https://images.unsplash.com/photo-1516684732162-798a0062be99?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80'
+            image: 'b4bb1e555d410a30955bdc44d32e375'
         }
     ];
 }
@@ -227,16 +227,39 @@ async function previewImage(input, dishNumber) {
         const reader = new FileReader();
         
         reader.onload = async function(e) {
+            // 先显示本地预览
             preview.src = e.target.result;
             
-            // 将图片转换为 base64
-            const base64Image = e.target.result.split(',')[1];
-            
-            // 生成唯一的文件名
-            const fileName = `dish_${dishNumber}_${Date.now()}.jpg`;
-            
             try {
-                // 上传图片到 GitHub
+                // 将图片转换为 base64
+                const base64Image = e.target.result.split(',')[1];
+                
+                // 生成唯一的文件名
+                const fileName = `dish_${dishNumber}_${Date.now()}.jpg`;
+                
+                // 检查 images 文件夹是否存在
+                const checkFolderResponse = await fetch('https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images', {
+                    headers: {
+                        'Authorization': `token ${GITHUB_TOKEN}`
+                    }
+                });
+
+                // 如果文件夹不存在，创建它
+                if (checkFolderResponse.status === 404) {
+                    await fetch('https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images/.gitkeep', {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${GITHUB_TOKEN}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: '创建 images 文件夹',
+                            content: btoa('')
+                        })
+                    });
+                }
+
+                // 上传图片
                 const uploadResponse = await fetch(`https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images/${fileName}`, {
                     method: 'PUT',
                     headers: {
@@ -252,13 +275,25 @@ async function previewImage(input, dishNumber) {
                 if (uploadResponse.ok) {
                     const data = await uploadResponse.json();
                     // 使用原始内容 URL
-                    preview.src = `https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/${fileName}`;
+                    const imageUrl = `https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/${fileName}`;
+                    preview.src = imageUrl;
+                    
+                    // 更新当前菜品的图片 URL
+                    const dishIndex = dishNumber - 1;
+                    if (dishIndex >= 0 && dishIndex < dishes.length) {
+                        dishes[dishIndex].image = imageUrl;
+                    }
                 } else {
                     throw new Error('图片上传失败');
                 }
             } catch (error) {
                 console.error('图片上传失败:', error);
                 alert('图片上传失败，请重试！');
+                // 恢复原始图片
+                const dishIndex = dishNumber - 1;
+                if (dishIndex >= 0 && dishIndex < dishes.length) {
+                    preview.src = dishes[dishIndex].image;
+                }
             }
         }
         
