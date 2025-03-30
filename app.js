@@ -17,7 +17,7 @@ function getInitialDishes() {
             id: 3,
             name: '鸡丝拌面',
             price: '¥14/份',
-            image: 'https://s21.ax1x.com/2025/03/31/pEsJOZn.jpg'
+            image: 'https://s21.ax1x.com/2025/03/31/pEsJqqs.jpg'
         },
         {
             id: 4,
