@@ -1,4 +1,4 @@
-/ 将 dishes 数组的初始化改为函数
+// 将 dishes 数组的初始化改为函数
 function getInitialDishes() {
     return [
         {
@@ -231,11 +231,11 @@ async function previewImage(input, dishNumber) {
             const base64Image = e.target.result.split(',')[1];
             
             // 生成唯一的文件名
-            const fileName = `images/dish_${dishNumber}_${Date.now()}.jpg`;
+            const fileName = `dish_${dishNumber}_${Date.now()}.jpg`;
             
             try {
                 // 上传图片到 GitHub
-                const uploadResponse = await fetch(`https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/${fileName}`, {
+                const uploadResponse = await fetch(`https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images/${fileName}`, {
                     method: 'PUT',
                     headers: {
                         'Authorization': `token ${GITHUB_TOKEN}`,
@@ -249,8 +249,8 @@ async function previewImage(input, dishNumber) {
 
                 if (uploadResponse.ok) {
                     const data = await uploadResponse.json();
-                    // 更新预览图片的 src 为 GitHub 上的图片 URL
-                    preview.src = data.content.download_url;
+                    // 使用原始内容 URL
+                    preview.src = `https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/${fileName}`;
                 } else {
                     throw new Error('图片上传失败');
                 }
@@ -287,7 +287,7 @@ async function saveEdit(dishNumber) {
         id: dishes[dishIndex].id,
         name: nameInput.value,
         price: priceInput.value,
-        image: imagePreview.src // 使用 GitHub 上的图片 URL
+        image: imagePreview.src // 使用原始内容 URL
     };
 
     // 更新数组中的特定菜品
