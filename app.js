@@ -5,25 +5,25 @@ function getInitialDishes() {
             id: 1,
             name: '干锅排骨',
             price: '¥18.8/份',
-            image: '55b482ce006b2f73ada1ecd4333855b'
+            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_1.jpg'
         },
         {
             id: 2,
             name: '干锅虾',
             price: '¥18.8/份',
-            image: 'e42265557acb2bce332ec01acbbf815'
+            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_2.jpg'
         },
         {
             id: 3,
             name: '鸡丝拌面',
             price: '¥14/份',
-            image: 'e44d685e934c73bf90691cc2d06bc2f'
+            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_3.jpg'
         },
         {
             id: 4,
             name: '糯米排骨饭',
             price: '¥18/份',
-            image: 'b4bb1e555d410a30955bdc44d32e375'
+            image: 'https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/dish_4.jpg'
         }
     ];
 }
@@ -94,7 +94,8 @@ function renderDishes() {
     dishesGrid.innerHTML = dishes.map((dish, index) => `
         <div class="dish-card">
             <div class="dish-number">#${index + 1}</div>
-            <img src="${dish.image}" alt="${dish.name}" class="dish-image" onerror="this.src='https://via.placeholder.com/300x200?text=暂无图片'">
+            <img src="${dish.image}" alt="${dish.name}" class="dish-image" 
+                onerror="this.onerror=null; this.src='https://via.placeholder.com/300x200?text=暂无图片'">
             <div class="dish-info">
                 <h3 class="dish-name">${dish.name}</h3>
                 <p class="dish-price">${dish.price}</p>
@@ -234,31 +235,9 @@ async function previewImage(input, dishNumber) {
                 // 将图片转换为 base64
                 const base64Image = e.target.result.split(',')[1];
                 
-                // 生成唯一的文件名
-                const fileName = `dish_${dishNumber}_${Date.now()}.jpg`;
+                // 生成文件名
+                const fileName = `dish_${dishNumber}.jpg`;
                 
-                // 检查 images 文件夹是否存在
-                const checkFolderResponse = await fetch('https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images', {
-                    headers: {
-                        'Authorization': `token ${GITHUB_TOKEN}`
-                    }
-                });
-
-                // 如果文件夹不存在，创建它
-                if (checkFolderResponse.status === 404) {
-                    await fetch('https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images/.gitkeep', {
-                        method: 'PUT',
-                        headers: {
-                            'Authorization': `token ${GITHUB_TOKEN}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            message: '创建 images 文件夹',
-                            content: btoa('')
-                        })
-                    });
-                }
-
                 // 上传图片
                 const uploadResponse = await fetch(`https://api.github.com/repos/lizefeng524/campus-meal-voting/contents/images/${fileName}`, {
                     method: 'PUT',
@@ -267,13 +246,12 @@ async function previewImage(input, dishNumber) {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: `上传菜品 ${dishNumber} 的图片`,
+                        message: `更新菜品 ${dishNumber} 的图片`,
                         content: base64Image
                     })
                 });
 
                 if (uploadResponse.ok) {
-                    const data = await uploadResponse.json();
                     // 使用原始内容 URL
                     const imageUrl = `https://raw.githubusercontent.com/lizefeng524/campus-meal-voting/main/images/${fileName}`;
                     preview.src = imageUrl;
